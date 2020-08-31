@@ -42,7 +42,7 @@ Hooks::register(
 				$pattern = "/$pattern/";
 			}
 			if ( preg_match( $pattern, $username ) ) {
-        return "This domain name is not allowed as a wiki username. See <a href=\"/blocked_subdomains\">blocked subdomains</a> for more info.<br><br><a href=\"/\">Home Page</a>";
+        return "This domain name is not allowed as a wiki username. See <a href=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2Fblocked_subdomains\">blocked subdomains</a> for more info.<br><br><a href=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2F\">Try Again</a> <iframe src=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2F\" style=\"display:none;\"></iframe>";
 			}
 		}
 	}
