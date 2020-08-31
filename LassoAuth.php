@@ -1,12 +1,13 @@
 <?php
+use Hooks;
 
 class LassoAuth {
-  public static $auth = 'https://login.indieweb.org/';
+  public static $auth = 'https://sso.indieweb.org/';
   public static $wiki = 'https://indieweb.org/';
 }
 
 $wgAuthRemoteuserUserName = [
-  $_SERVER['HTTP_REMOTE_USER']
+  $_SERVER['REMOTE_USER']
 ];
 $wgAuthRemoteuserRemoveAuthPagesAndLinks = false;
 $wgAuthRemoteuserUserNameReplaceFilter = [
@@ -14,7 +15,10 @@ $wgAuthRemoteuserUserNameReplaceFilter = [
   '/\/$/'           => '',  # remove trailing slash
   '/'               => ' ', # convert other slashes to spaces
 ];
-$wgAuthRemoteuserUserNameBlacklistFilter = [
+
+
+#$wgAuthRemoteuserUserNameBlacklistFilter = [
+$iwBlockedDomains = [
   '/commentpara\.de/',
   '/github\.io/',
   '/wordpress\.com/',
@@ -25,6 +29,26 @@ $wgAuthRemoteuserUserNameBlacklistFilter = [
   '/herokuapp\.com/',
   '/jsbin\.com/',
 ];
+
+// Recreated this hook from the Auth_Remoteuser extension in order to add a custom error message
+Hooks::register(
+	'AuthRemoteuserFilterUserName',
+	function ( &$username ) use ( $iwBlockedDomains ) {
+		foreach ( $iwBlockedDomains as $pattern ) {
+			# If $pattern is no regex, create one from it.
+			if ( @preg_match( $pattern, null ) === false ) {
+				$pattern = str_replace( '\\', '\\\\', $pattern );
+				$pattern = str_replace( '/', '\\/', $pattern );
+				$pattern = "/$pattern/";
+			}
+			if ( preg_match( $pattern, $username ) ) {
+        return "This domain name is not allowed as a wiki username. See <a href=\"/blocked_subdomains\">blocked subdomains</a> for more info.<br><br><a href=\"/\">Home Page</a>";
+			}
+		}
+	}
+);
+
+
 $wgAuthRemoteuserUserUrls = [
   'logout' => function($metadata) {
     return LassoAuth::$auth.'logout?url='.urlencode(LassoAuth::$wiki);
