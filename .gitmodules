@@ -1,0 +1,3 @@
+[submodule "IndieWebPost"]
+	path = IndieWebPost
+	url = git@github.com:grantcodes/indiewebpost-mediawiki-extension.git
