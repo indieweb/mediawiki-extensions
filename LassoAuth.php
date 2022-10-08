@@ -1,5 +1,4 @@
 <?php
-use Hooks;
 
 class LassoAuth {
   public static $auth = 'https://sso.indieweb.org/';
@@ -31,22 +30,19 @@ $iwBlockedDomains = [
 ];
 
 // Recreated this hook from the Auth_Remoteuser extension in order to add a custom error message
-Hooks::register(
-	'AuthRemoteuserFilterUserName',
-	function ( &$username ) use ( $iwBlockedDomains ) {
-		foreach ( $iwBlockedDomains as $pattern ) {
-			# If $pattern is no regex, create one from it.
-			if ( @preg_match( $pattern, null ) === false ) {
-				$pattern = str_replace( '\\', '\\\\', $pattern );
-				$pattern = str_replace( '/', '\\/', $pattern );
-				$pattern = "/$pattern/";
-			}
-			if ( preg_match( $pattern, $username ) ) {
-        return "This domain name is not allowed as a wiki username. See <a href=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2Fblocked_subdomains\">blocked subdomains</a> for more info.<br><br><a href=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2F\">Try Again</a> <iframe src=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2F\" style=\"display:none;\"></iframe>";
-			}
-		}
-	}
-);
+$wgHooks['AuthRemoteuserFilterUserName'][] = function ( &$username ) use ( $iwBlockedDomains ) {
+  foreach ( $iwBlockedDomains as $pattern ) {
+    # If $pattern is no regex, create one from it.
+    if ( @preg_match( $pattern, null ) === false ) {
+      $pattern = str_replace( '\\', '\\\\', $pattern );
+      $pattern = str_replace( '/', '\\/', $pattern );
+      $pattern = "/$pattern/";
+    }
+    if ( preg_match( $pattern, $username ) ) {
+      return "This domain name is not allowed as a wiki username. See <a href=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2Fblocked_subdomains\">blocked subdomains</a> for more info.<br><br><a href=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2F\">Try Again</a> <iframe src=\"https://sso.indieweb.org/logout?url=https%3A%2F%2Findieweb.org%2F\" style=\"display:none;\"></iframe>";
+    }
+  }
+};
 
 
 $wgAuthRemoteuserUserUrls = [
